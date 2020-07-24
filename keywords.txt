@@ -2,4 +2,4 @@ SICC	KEYWORD1
 send	KEYWORD2
 receive	KEYWORD2
 setDelay	KEYWORD2
-isTimeout KEYWORD2
+isTimeout	KEYWORD2

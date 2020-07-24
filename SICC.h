@@ -17,7 +17,6 @@ private:
     byte readByte(); //255 represents restart signal
     bool writeByte(byte c); //Returns ACK or NACK
     void sendRestart(); //Send restart signal
-    bool sendUtil(char* x, long timeout); //To account for timeouts
 
 public:
     SICC(uint8_t SCL, uint8_t SDA, int delay=100); //Constructor
