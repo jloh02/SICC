@@ -92,7 +92,7 @@ void SICC::receive(char* recvBuf, long timeout){
 
     if(corrupt) {
         delay(5);
-        SICC::receive(recvBuf, timeout);
+        SICC::receive(recvBuf, timeout-micros()+startTime);
     }
 }
 

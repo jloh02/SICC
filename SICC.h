@@ -6,7 +6,7 @@
 #define CORRUPTION_CODE 255
 #define TIMEOUT_CODE 254
 
-#define BIT_TIMEOUT 12000    //Hardcoded timeout per bit (Possible known bug?)
+#define BIT_TIMEOUT 12000    //Hardcoded timeout per bit (Possible bug if receive() consistently returns TIMEOUT_CODE)
 
 class SICC
 {
