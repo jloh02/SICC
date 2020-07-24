@@ -6,7 +6,7 @@
 #define CORRUPTION_CODE 255
 #define TIMEOUT_CODE 254
 
-#define BIT_TIMEOUT (DELAY_TIME*3)    //Hardcoded timeout per bit
+#define BIT_TIMEOUT 12000    //Hardcoded timeout per bit (Possible known bug?)
 
 class SICC
 {
@@ -17,10 +17,11 @@ private:
     byte readByte(); //255 represents restart signal
     bool writeByte(byte c); //Returns ACK or NACK
     void sendRestart(); //Send restart signal
+    bool sendUtil(char* x, long timeout); //To account for timeouts
 
 public:
     SICC(uint8_t SCL, uint8_t SDA, int delay=100); //Constructor
-    bool send(char* s); //Send message
+    bool send(char* s, long timeout); //Send message
     void receive(char* recvBuf, long timeout); //Receive message, timeout in nanosecs
     void setDelay(int delayMicros); //Set message delay in microseconds
 };

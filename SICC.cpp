@@ -5,7 +5,11 @@ SICC::SICC(uint8_t SCL, uint8_t SDA, int delay/*=100*/){
     clock_line = SCL;
     data_line = SDA;
 }
-bool SICC::send(char* s){
+bool SICC::send(char* s, long timeout){
+    startTime = micros();
+    return sendUtil(s, timeout);
+}
+bool SICC::sendUtil(char* s, long timeout){
     isSending(true);
 
     //Write 'start'
@@ -36,9 +40,11 @@ bool SICC::send(char* s){
     
     delayMicroseconds(DELAY_TIME);
 
+    if(micros()-startTime>timeout) return false;
+
     if(!ack) {
         delay(10);
-        return SICC::send(s);
+        return SICC::sendUtil(s, timeout);
     }
 
     return true;
@@ -86,7 +92,7 @@ void SICC::receive(char* recvBuf, long timeout){
 
     if(corrupt) {
         delay(5);
-        SICC::receive(recvBuf, timeout-micros()+startTime);
+        SICC::receive(recvBuf, timeout);
     }
 }
 
