@@ -6,7 +6,7 @@ SICC::SICC(uint8_t SCL, uint8_t SDA, int delay/*=100*/){
     data_line = SDA;
 }
 bool SICC::send(char* s, long timeout){
-    startTime = micros();
+    startTime = (long) micros();
     isSending(true);
 
     //Write 'start'
@@ -17,7 +17,7 @@ bool SICC::send(char* s, long timeout){
     bool ack = writeByte(strlen(s));
 
     //Iterate through each character
-    for (int i = 0; i < strlen(s) && ack; i++) {
+    for (unsigned int i = 0; i < strlen(s) && ack; i++) {
         char c = s[i];
         ack = writeByte(c);
     }
@@ -37,60 +37,56 @@ bool SICC::send(char* s, long timeout){
     
     delayMicroseconds(DELAY_TIME);
 
-    if(micros()-startTime>timeout) return false;
-
     if(!ack) {
+        if((long) micros()-startTime>timeout) return false;
         delay(10);
-        return SICC::send(s, timeout-micros()+startTime);
+        return SICC::send(s, timeout-(long)micros()+startTime);
     }
 
     return true;
 }
-void SICC::receive(char* recvBuf, long timeout){
+bool SICC::receive(char* recvBuf, long timeout){
     isSending(false);
 
     //Wait for start condition
-    startTime = micros();
+    startTime = (long) micros();
     while(digitalRead(data_line) || !digitalRead(clock_line)) {
-        if(micros()-startTime>timeout){
-            recvBuf[0] = TIMEOUT_CODE;
-            recvBuf[1] = 0;
-            return;
+        if((long)micros()-startTime>timeout){
+            recvBuf[0] = 0;
+            return false;
         }
     }
     while(digitalRead(clock_line)) {
-        if(micros()-startTime>timeout){
-            recvBuf[0] = TIMEOUT_CODE;
-            recvBuf[1] = 0;
-            return;
+        if((long)micros()-startTime>timeout){
+            recvBuf[0] = 0;
+            return false;
         }
     }
 
     //Receive size of data
     byte numChar = readByte();
     if(numChar == TIMEOUT_CODE) {
-        recvBuf[0] = TIMEOUT_CODE;
-        recvBuf[1] = 0;
-        return;
+        recvBuf[0] = 0;
+        return false;
     }
     bool corrupt = numChar == CORRUPTION_CODE;
     
     //Receive bytes
     for (int i = 0; i < numChar && !corrupt; i++) {
         recvBuf[i] = char(readByte());
-        if(recvBuf[i] == TIMEOUT_CODE) {
-            recvBuf[0] = TIMEOUT_CODE;
-            recvBuf[1] = 0;
-            return;
+        if((byte) recvBuf[i] == TIMEOUT_CODE) {
+            recvBuf[0] = 0;
+            return false;
         }
-        corrupt = recvBuf[i] == CORRUPTION_CODE;        
+        corrupt = (byte) recvBuf[i] == CORRUPTION_CODE;        
     }
     recvBuf[numChar] = 0;
 
     if(corrupt) {
         delay(5);
-        SICC::receive(recvBuf, timeout-micros()+startTime);
+        return SICC::receive(recvBuf, timeout-micros()+startTime);
     }
+    return true;
 }
 
 bool SICC::writeByte(byte c){
@@ -166,12 +162,4 @@ void SICC::isSending(bool state){
     }
     pinMode(clock_line, INPUT_PULLUP);
     pinMode(data_line, INPUT_PULLUP); 
-}
-
-
-bool isByteChar(char c, byte b){
-    return (byte)c == b;
-}
-bool isTimeout(char* recv){
-    return isByteChar(recv[0],TIMEOUT_CODE);
 }

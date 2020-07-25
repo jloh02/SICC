@@ -21,9 +21,8 @@ private:
 public:
     SICC(uint8_t SCL, uint8_t SDA, int delay=100); //Constructor
     bool send(char* s, long timeout); //Send message
-    void receive(char* recvBuf, long timeout); //Receive message, timeout in nanosecs
+    bool receive(char* recvBuf, long timeout); //Receive message, timeout in nanosecs
     void setDelay(int delayMicros); //Set message delay in microseconds
 };
 
-bool isTimeout(char* recv); //Utility function to check if string is timeout response (Uses isByteChar(char c, byte b) utility function)
 #endif
