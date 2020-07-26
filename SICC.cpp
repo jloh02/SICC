@@ -5,8 +5,11 @@ SICC::SICC(uint8_t SCL, uint8_t SDA, int delay/*=100*/){
     clock_line = SCL;
     data_line = SDA;
 }
-bool SICC::send(char* s, long timeout){
-    startTime = (long) micros();
+bool SICC::send(char* s){
+    return send(s,(unsigned long)(-1));
+}
+bool SICC::send(char* s, unsigned long timeout){
+    startTime = (unsigned long) micros();
     isSending(true);
 
     //Write 'start'
@@ -38,26 +41,26 @@ bool SICC::send(char* s, long timeout){
     delayMicroseconds(DELAY_TIME);
 
     if(!ack) {
-        if((long) micros()-startTime>timeout) return false;
         delay(10);
-        return SICC::send(s, timeout-(long)micros()+startTime);
+        if((unsigned long) micros()-startTime>timeout) return false;
+        return SICC::send(s, timeout-(unsigned long)micros()+startTime);
     }
 
     return true;
 }
-bool SICC::receive(char* recvBuf, long timeout){
+bool SICC::receive(char* recvBuf, unsigned long timeout){
     isSending(false);
 
     //Wait for start condition
-    startTime = (long) micros();
+    startTime = (unsigned long) micros();
     while(digitalRead(data_line) || !digitalRead(clock_line)) {
-        if((long)micros()-startTime>timeout){
+        if((unsigned long)micros()-startTime>timeout){
             recvBuf[0] = 0;
             return false;
         }
     }
     while(digitalRead(clock_line)) {
-        if((long)micros()-startTime>timeout){
+        if((unsigned long)micros()-startTime>timeout){
             recvBuf[0] = 0;
             return false;
         }
@@ -84,6 +87,10 @@ bool SICC::receive(char* recvBuf, long timeout){
 
     if(corrupt) {
         delay(5);
+        if((unsigned long)micros()-startTime>timeout){
+            recvBuf[0] = 0;
+            return false;
+        }
         return SICC::receive(recvBuf, timeout-micros()+startTime);
     }
     return true;

@@ -11,7 +11,7 @@
 class SICC
 {
 private:
-    long startTime; //Used for timeouts
+    unsigned long startTime; //Used for timeouts
     int DELAY_TIME, clock_line, data_line;
     void isSending(bool state); //Set pinModes
     byte readByte(); //255 represents restart signal
@@ -20,8 +20,9 @@ private:
 
 public:
     SICC(uint8_t SCL, uint8_t SDA, int delay=100); //Constructor
-    bool send(char* s, long timeout); //Send message
-    bool receive(char* recvBuf, long timeout); //Receive message, timeout in nanosecs
+    bool send(char* s); //Send without timeout (timeout = (2^32-1)us ~ 71 mins)
+    bool send(char* s, unsigned long timeout); //Send message
+    bool receive(char* recvBuf, unsigned long timeout); //Receive message, timeout in nanosecs
     void setDelay(int delayMicros); //Set message delay in microseconds
 };
 
