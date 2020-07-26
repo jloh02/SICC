@@ -48,6 +48,9 @@ bool SICC::send(char* s, unsigned long timeout){
 
     return true;
 }
+bool SICC::receive(char* recvBuf){
+    return receive(recvBuf,(unsigned long)(-1));
+}
 bool SICC::receive(char* recvBuf, unsigned long timeout){
     isSending(false);
 
