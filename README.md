@@ -14,8 +14,8 @@ Developed for Arduino, but compatible with other architectures by changing `dela
 	- [Restarting](#restarting)
 	- [Timeouts](#timeouts)
 
-For **API**, refer to **[api.md](api.md)**<br>
-For **examples**, refer to **[examples.md](examples.md)**
+For **API**, refer to **[api.md](docs/api.md)**<br>
+For **examples**, refer to **[examples.md](docs/examples.md)**
 
 ## Contributors
 Name | Role
