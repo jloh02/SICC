@@ -5,10 +5,7 @@ SICC::SICC(uint8_t SCL, uint8_t SDA, int delay/*=100*/){
     clock_line = SCL;
     data_line = SDA;
 }
-bool SICC::send(char* s){
-    return send(s,(unsigned long)(-1));
-}
-bool SICC::send(char* s, unsigned long timeout){
+bool SICC::send(char* s, unsigned long timeout/*=-1*/){
     startTime = (unsigned long) micros();
     isSending(true);
 
@@ -48,10 +45,7 @@ bool SICC::send(char* s, unsigned long timeout){
 
     return true;
 }
-bool SICC::receive(char* recvBuf){
-    return receive(recvBuf,(unsigned long)(-1));
-}
-bool SICC::receive(char* recvBuf, unsigned long timeout){
+bool SICC::receive(char* recvBuf, unsigned long timeout/*=-1*/){
     isSending(false);
 
     //Wait for start condition
