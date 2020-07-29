@@ -21,7 +21,7 @@ For **examples**, refer to **[examples.md](examples.md)**
 Name | Role
 --- | ---
 Jonathan Loh | Main Developer
-River Koh | Testing, QC and Feature Request
+River Koh | Testing and QC
 
 ## Key Differences with I2C
 - Synchronous (Blocking)
@@ -38,19 +38,25 @@ All inputs will be pulled up using the internal pullup resistor. Inputs default 
 ### Overview of Protocol
 Every data transmission begins with a start condition, this will be covered later. The transmitter will then alternate SCL between HIGH and LOW. This will regulate when to send and read data from SDA.
 
+- Image of SCL alt 
+
 ### Start Condition
 SCL is HIGH and SDA is pulled LOW
-
+- Start cond
 
 ### Data Packet
 Each data packet begins with the data length, followed by the data.
+- Table Packet
 
-Each byte of data is sent in 8 bits, with a 9th bit sent as acknowledgement (ACK). When SCL is LOW, the transmitter will change the bit according to the byte to be sent. When SCL is HIGH, the receiver will read the bit. For the 9th bit, the transmitter will allow the SDA to float HIGH and sets the SCL to HIGH. During this period, the receiver will pull the SDA LOW, signalling an ACK. 
+Each byte of data is sent in 8 bits, with a 9th bit sent as acknowledgement (ACK). When SCL is LOW, the transmitter will change the bit according to the byte to be sent. When SCL is HIGH, the receiver will read the bit. 
+- Transmission
 
-If no acknowledgement (NACK) is received by the transmitter, a restart is conducted. Each bit is also given a fixed timeout to be received. If the bit is not received, a restart is conducted by not sending an ACK.
+For the 9th bit, the transmitter will allow the SDA to float HIGH and sets the SCL to HIGH. During this period, the receiver will pull the SDA LOW, signalling an ACK. If no acknowledgement (NACK) is received by the transmitter, a restart is conducted. Each bit is also given a fixed timeout to be received. If the bit is not received, a restart is conducted by not sending an ACK.
+- Acknowledgement
 
 ### Restarting
-If a restart is called by the transmitter due to NACK, the next time the SCL is HIGH (a bit is to be sent), the transmitter will oscillate SDA 10 times. If the receiver detects more than 3 oscillations (the number 3 was to cater for rising and falling edge errors), the receiver restarts the receiving function after SCL is pulled LOW again. Since the transmitter initiated the restart, it resets the send function after setting SCL LOW.
+If a restart is called by the transmitter due to NACK, the next time the SCL is HIGH (a bit is to be sent), the transmitter will oscillate SDA 10 times. If the receiver detects more than 3 oscillations (the number 3 was chosen to cater for rising and falling edge errors), the receiver restarts the receiving function after SCL is pulled LOW again. Since the transmitter initiated the restart, it resets the send function after setting SCL LOW.
+- Restart Cond
 
 ### Timeouts
 An overall timeout is given to the entire message transmission. The transmission is terminated if the message is not sent or received within the timeout and the process is stuck in a while-loop or a restart is called. 
